@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professional Kanban Board</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #121212; /* Dark background */
+      color: #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px;
+      background: #1f1f1f;
+      color: #ffffff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.4rem;
+    }
+
+    header p {
+      margin: 5px 0 0;
+      font-size: 1.1rem;
+    }
+
+    /* Board Layout */
+    .board {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin: 20px auto;
+      padding: 20px;
+      gap: 15px;
+      max-width: 1400px;
+    }
+
+    .column {
+      border-radius: 10px;
+      padding: 10px;
+      flex: 1 1 calc(25% - 20px); /* Adjusted width for square layout */
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s ease;
+      min-width: 250px;
+      height: 300px; /* Square-like height */
+      overflow: hidden; /* Ensure buttons are visible */
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .column:hover {
+      transform: scale(1.02);
+    }
+
+    .column h2 {
+      text-align: center;
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 5px;
+      color: black; /* Black text for headers */
+    }
+
+    .task-container {
+      flex-grow: 1;
+      padding: 10px;
+      background: #333333;
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      height: calc(100% - 60px); /* Adjusted for square box layout */
+      overflow-y: auto;
+    }
+
+    .task-container:hover {
+      background: #444444;
+    }
+
+    .task {
+      background: #0077b6;
+      color: white;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      font-size: 0.9rem;
+      cursor: grab;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .task:hover {
+      transform: scale(1.05);
+      background: #005f99;
+    }
+
+    .task:active {
+      cursor: grabbing;
+    }
+
+    .task .priority {
+      font-size: 0.8rem;
+      font-weight: bold;
+      padding: 5px;
+      border-radius: 5px;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+
+    .task .priority.low {
+      background-color: #76c7c0; /* Light Green */
+    }
+
+    .task .priority.medium {
+      background-color: #f7a832; /* Orange */
+    }
+
+    .task .priority.high {
+      background-color: #f44336; /* Red */
+    }
+
+    .task .timestamp {
+      font-size: 0.7rem;
+      margin-top: 5px;
+      color: #b0b0b0;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      background: #0077b6;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: background 0.3s ease-in-out;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #005f99;
+    }
+
+    /* Column Background Colors */
+    .column#backlog {
+      background: #f8c8d0; /* Light Pink */
+    }
+
+    .column#ready-dev {
+      background: #c8f7c5; /* Light Green */
+    }
+
+    .column#inprogress {
+      background: #d1b7f1; /* Light Purple */
+    }
+
+    .column#code-review {
+      background: #ffde59; /* Yellow */
+    }
+
+    .column#testing {
+      background: #fcbad3; /* Soft Pink */
+    }
+
+    .column#blocked {
+      background: #f77f72; /* Red-Orange */
+    }
+
+    .column#ready-deploy {
+      background: #87d4f7; /* Light Blue */
+    }
+
+    .column#prod-support {
+      background: #9cffac; /* Light Greenish */
+    }
+
+    .column#completed {
+      background: #b3e5fc; /* Soft Cyan */
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Professional IT Kanban Board</h1>
+    <p>Track your IT tasks and workflows efficiently!</p>
+  </header>
+
+  <main>
+    <div class="board">
+      <!-- Backlog -->
+      <div class="column" id="backlog">
+        <h2>Backlog</h2>
+        <div class="task-container" ondrop="drop(event)" ondragover="allowDrop(event)">
+        </div>
+        <button onclick="addTask('backlog')">+ Add Task</button>
+      </div>
+
+      <!-- Ready for Development -->
+      <div class="column" id="ready-dev">
+        <h2>Ready for Development</h2>
+        <div class="task-container" ondrop="drop(event)" ondragover="allowDrop(event)">
+        </div>
+        <button onclick="addTask('ready-dev')">+ Add Task</button>
+      </div>
+
+      <!-- In Progress -->
+      <div class="column" id="inprogress">
+        <h2>In Progress</h2>
+        <div class="task-container" ondrop="drop(event)" ondragover="allowDrop(event)">
+        </div>
+        <button onclick="addTask('inprogress')">+ Add Task</button>
+      </div>
+
+      <!-- Code Review -->
+      <div class="column" id="code-review">
+        <h2>Code Review</h2>
+        <div class="task-container" ondrop="drop(event)" ondragover="allowDrop(event)">
+        </div>
+        <button onclick="addTask('code-review')">+ Add Task</button>
+      </div>
+
+      <!-- Testing/QA -->
+      <div class="column" id="testing">
+        <h2>Testing/QA</h2>
+        <div class="task-container" ondrop="drop(event)" ondragover="allowDrop(event)">
+        </div>
+        <button onclick="addTask('testing')">+ Add Task</button>
+      </div>
+
+      <!-- Blocked -->
+      <div class="column" id="blocked">
+        <h2>Blocked</h2>
+        <div class="task-container" ondrop="drop(event)" ondragover="allowDrop(event)">
+        </div>
+        <button onclick="addTask('blocked')">+ Add Task</button>
+      </div>
+
+      <!-- Ready for Deployment -->
+      <div class="column" id="ready-deploy">
+        <h2>Ready for Deployment</h2>
+        <div class="task-container" ondrop="drop(event)" ondragover="allowDrop(event)">
+        </div>
+        <button onclick="addTask('ready-deploy')">+ Add Task</button>
+      </div>
+
+      <!-- Production Support -->
+      <div class="column" id="prod-support">
+        <h2>Production Support</h2>
+        <div class="task-container" ondrop="drop(event)" ondragover="allowDrop(event)">
+        </div>
+        <button onclick="addTask('prod-support')">+ Add Task</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+
+    function drag(event) {
+      event.dataTransfer.setData("text", event.target.id);
+    }
+
+    function drop(event) {
+      event.preventDefault();
+      const data = event.dataTransfer.getData("text");
+      const task = document.getElementById(data);
+      event.target.appendChild(task);
+    }
+
+    function addTask(columnId) {
+      const taskText = prompt("Enter task description:");
+      const priority = prompt("Enter priority (low, medium, high):").toLowerCase();
+
+      if (taskText && (priority === "low" || priority === "medium" || priority === "high")) {
+        const taskContainer = document.querySelector(`#${columnId} .task-container`);
+        const newTask = document.createElement("div");
+        newTask.className = "task";
+        newTask.draggable = true;
+        newTask.ondragstart = drag;
+        newTask.textContent = taskText;
+        newTask.id = `task${Math.random().toString(36).substr(2, 9)}`;
+        
+        const priorityElement = document.createElement("div");
+        priorityElement.className = `priority ${priority}`;
+        priorityElement.textContent = priority.charAt(0).toUpperCase() + priority.slice(1);
+        priorityElement.onclick = function() {
+          changePriority(newTask);
+        };
+        newTask.appendChild(priorityElement);
+
+        const timestampElement = document.createElement("div");
+        timestampElement.className = "timestamp";
+        timestampElement.textContent = `Created on: ${new Date().toLocaleString()}`;
+        newTask.appendChild(timestampElement);
+
+        taskContainer.appendChild(newTask);
+      } else {
+        alert("Please enter a valid task description and priority.");
+      }
+    }
+
+    function changePriority(task) {
+      const newPriority = prompt("Change priority (low, medium, high):").toLowerCase();
+      if (newPriority === "low" || newPriority === "medium" || newPriority === "high") {
+        const priorityElement = task.querySelector(".priority");
+        priorityElement.className = `priority ${newPriority}`;
+        priorityElement.textContent = newPriority.charAt(0).toUpperCase() + newPriority.slice(1);
+      } else {
+        alert("Invalid priority.");
+      }
+    }
+  </script>
+</body>
+</html>
+
+
